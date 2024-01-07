@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "safejump",
+	"version": "${version}",
+	"name": "safejump",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "GPL-3.0",
+	"icon": "assets/safejump/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			{
+				"value": "de.greenman999.safejump.SafeJump",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"mixins": [
+		"safejump.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.3",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*",
+		"fabric-language-kotlin": ">=1.9.22"
+	}
+}
