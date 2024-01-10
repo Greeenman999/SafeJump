@@ -19,6 +19,7 @@ import net.minecraft.world.World
 import org.joml.Quaternionf
 import org.lwjgl.glfw.GLFW
 import org.slf4j.LoggerFactory
+import kotlin.math.roundToInt
 
 object SafeJump : ClientModInitializer {
     private val logger = LoggerFactory.getLogger("safejump")
@@ -56,10 +57,10 @@ object SafeJump : ClientModInitializer {
 							}
 						}
 						if(isAir(world, pos) && !isAir(world, pos.down())) {
-							val fallDamage = 0f.coerceAtLeast(height.toFloat() - 3.0f)
+							val fallDamage = 0f.coerceAtLeast(height.toFloat() - 3.5f)
 							val finalDamage = player.modifyAppliedDamage(world.damageSources.fall(), fallDamage)
 							val death: Boolean = finalDamage >= player.health
-							renderFloatOnBlock(finalDamage, pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers(), death)
+							renderStringOnBlock(finalDamage.roundToInt().toString(), pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers(), death)
 							break
 						}
 					}
@@ -74,10 +75,10 @@ object SafeJump : ClientModInitializer {
 	}
 
 	fun onRenderKeyPressed(action: Int) {
-		isPressed = action == GLFW.GLFW_PRESS
+		isPressed = action == GLFW.GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null
 	}
 
-	private fun renderFloatOnBlock(value: Float, pos: BlockPos, matrices: MatrixStack, world: World, camera: Camera, vertexConsumers: VertexConsumerProvider?, death: Boolean) {
+	private fun renderStringOnBlock(value: String, pos: BlockPos, matrices: MatrixStack, world: World, camera: Camera, vertexConsumers: VertexConsumerProvider?, death: Boolean) {
 		val transformedPos = pos.toCenterPos().subtract(0.0, 0.5, 0.0).subtract(camera.pos)
 		val outlineShape = world.getBlockState(pos).getOutlineShape(world, pos)
 		val max = if (outlineShape.isEmpty) {
@@ -90,7 +91,7 @@ object SafeJump : ClientModInitializer {
 		matrices.multiply(Quaternionf().fromAxisAngleDeg(1f, 0f, 0f, 90f))
 		val size = 0.07f
 		matrices.scale(-size, -size, size)
-		val literal: Text = Text.literal(value.toString())
+		val literal: Text = Text.literal(value)
 		val textRenderer = MinecraftClient.getInstance().textRenderer
 		textRenderer.draw(
 			literal,
