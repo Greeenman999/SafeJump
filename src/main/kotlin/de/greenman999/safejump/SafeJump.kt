@@ -1,18 +1,24 @@
 package de.greenman999.safejump
 
-import de.greenman999.safejump.renderer.HeightLevelRenderer
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterEntities
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.option.KeyBinding
+import net.minecraft.client.render.Camera
+import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.util.InputUtil
+import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.text.Text
+import net.minecraft.util.Colors
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.world.World
+import org.joml.Quaternionf
 import org.lwjgl.glfw.GLFW
 import org.slf4j.LoggerFactory
-
 
 object SafeJump : ClientModInitializer {
     private val logger = LoggerFactory.getLogger("safejump")
@@ -50,7 +56,10 @@ object SafeJump : ClientModInitializer {
 							}
 						}
 						if(isAir(world, pos) && !isAir(world, pos.down())) {
-							HeightLevelRenderer().renderHeightLevel(height, pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers())
+							val fallDamage = 0f.coerceAtLeast(height.toFloat() - 3.0f)
+							val finalDamage = player.modifyAppliedDamage(world.damageSources.fall(), fallDamage)
+							val death: Boolean = finalDamage >= player.health
+							renderFloatOnBlock(finalDamage, pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers(), death)
 							break
 						}
 					}
@@ -66,6 +75,36 @@ object SafeJump : ClientModInitializer {
 
 	fun onRenderKeyPressed(action: Int) {
 		isPressed = action == GLFW.GLFW_PRESS
+	}
+
+	private fun renderFloatOnBlock(value: Float, pos: BlockPos, matrices: MatrixStack, world: World, camera: Camera, vertexConsumers: VertexConsumerProvider?, death: Boolean) {
+		val transformedPos = pos.toCenterPos().subtract(0.0, 0.5, 0.0).subtract(camera.pos)
+		val outlineShape = world.getBlockState(pos).getOutlineShape(world, pos)
+		val max = if (outlineShape.isEmpty) {
+			1.0
+		} else {
+			outlineShape.getMax(Direction.Axis.Y)
+		}
+		matrices.push()
+		matrices.translate(transformedPos.x, transformedPos.y + max, transformedPos.z)
+		matrices.multiply(Quaternionf().fromAxisAngleDeg(1f, 0f, 0f, 90f))
+		val size = 0.07f
+		matrices.scale(-size, -size, size)
+		val literal: Text = Text.literal(value.toString())
+		val textRenderer = MinecraftClient.getInstance().textRenderer
+		textRenderer.draw(
+			literal,
+			-textRenderer.getWidth(literal) / 2.0f,
+			-3.5f,
+			if(death) Colors.RED else Colors.WHITE,
+			false,
+			matrices.peek().positionMatrix,
+			vertexConsumers,
+			TextRenderer.TextLayerType.POLYGON_OFFSET,
+			0,
+			15728880
+		)
+		matrices.pop()
 	}
 
 }
