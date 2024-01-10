@@ -19,105 +19,112 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import java.util.*
 
-object SafeJumpConfig {
-    var HANDLER: ConfigClassHandler<SafeJumpConfig> = ConfigClassHandler.createBuilder(SafeJumpConfig::class.java)
-        .id(Identifier("safejump", "safejumpconfig"))
-        .serializer { config: ConfigClassHandler<SafeJumpConfig>? ->
-            GsonConfigSerializerBuilder.create(config)
-                .setPath(FabricLoader.getInstance().configDir.resolve("safejump.json5"))
-                .setJson5(true)
-                .build()
-        }
-        .build()
+class SafeJumpConfig {
+    companion object {
+        var HANDLER: ConfigClassHandler<SafeJumpConfig> = ConfigClassHandler.createBuilder(SafeJumpConfig::class.java)
+            .id(Identifier("safejump", "safejumpconfig"))
+            .serializer { config: ConfigClassHandler<SafeJumpConfig>? ->
+                GsonConfigSerializerBuilder.create(config)
+                    .setPath(FabricLoader.getInstance().configDir.resolve("safejump.json5"))
+                    .setJson5(true)
+                    .build()
+            }
+            .build()
 
-    @SerialEntry
-    var radius: Int = 2
+        @SerialEntry
+        var radius: Int = 2
 
-    @SerialEntry
-    var enabled: Boolean = true
+        @SerialEntry
+        var enabled: Boolean = true
 
-    @SerialEntry
-    var actionBar: Boolean = true
+        @SerialEntry
+        var actionBar: Boolean = true
 
-    @SerialEntry
-    var displayType: DisplayType = DisplayType.HEIGHT
+        @SerialEntry
+        var displayType: DisplayType = DisplayType.HEIGHT
 
-    fun openConfigScreen(parent: Screen?): Screen {
-        return YetAnotherConfigLib.createBuilder()
-            .title(Text.translatable("safejump.config.title"))
-            .category(ConfigCategory.createBuilder()
-                .name(Text.translatable("safejump.config.categories.main.name"))
-                .option(
-                    Option.createBuilder<Boolean>()
-                        .name(Text.translatable("safejump.config.categories.main.options.enabled.name"))
-                        .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.enabled.description")))
-                        .binding(true, { enabled }, { enabled = it })
-                        .controller { opt -> BooleanControllerBuilder.create(opt)
-                            .coloured(true)
-                            .yesNoFormatter()
-                        }
-                    .build())
-                .option(
-                    Option.createBuilder<Boolean>()
-                        .name(Text.translatable("safejump.config.categories.main.options.actionbar.name"))
-                        .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.actionbar.description")))
-                        .binding(true, { actionBar }, { actionBar = it })
-                        .controller { opt -> BooleanControllerBuilder.create(opt)
-                            .coloured(true)
-                            .yesNoFormatter()
+        fun openConfigScreen(parent: Screen?): Screen {
+            return YetAnotherConfigLib.createBuilder()
+                .title(Text.translatable("safejump.config.title"))
+                .category(ConfigCategory.createBuilder()
+                    .name(Text.translatable("safejump.config.categories.main.name"))
+                    .option(
+                        Option.createBuilder<Boolean>()
+                            .name(Text.translatable("safejump.config.categories.main.options.enabled.name"))
+                            .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.enabled.description")))
+                            .binding(true, { enabled }, { enabled = it })
+                            .controller { opt ->
+                                BooleanControllerBuilder.create(opt)
+                                    .coloured(true)
+                                    .yesNoFormatter()
+                            }
+                            .build())
+                    .option(
+                        Option.createBuilder<Boolean>()
+                            .name(Text.translatable("safejump.config.categories.main.options.actionbar.name"))
+                            .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.actionbar.description")))
+                            .binding(true, { actionBar }, { actionBar = it })
+                            .controller { opt ->
+                                BooleanControllerBuilder.create(opt)
+                                    .coloured(true)
+                                    .yesNoFormatter()
+                            }
+                            .build())
+                    .option(
+                        Option.createBuilder<DisplayType>()
+                            .name(Text.translatable("safejump.config.categories.main.options.display-type.name"))
+                            .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.display-type.description")))
+                            .binding(DisplayType.HEIGHT, { displayType }, { displayType = it })
+                            .controller { opt ->
+                                EnumControllerBuilder.create(opt)
+                                    .enumClass(DisplayType::class.java)
+                            }
+                            .build())
+                    .option(
+                        Option.createBuilder<Int>()
+                            .name(Text.translatable("safejump.config.categories.main.options.radius.name"))
+                            .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.radius.description")))
+                            .binding(2, { radius }, { radius = it })
+                            .controller { opt ->
+                                IntegerSliderControllerBuilder.create(opt)
+                                    .range(1, 10)
+                                    .step(1)
+                            }
+                            .build())
+                    .option(
+                        LabelOption.createBuilder()
+                            .line(
+                                Text.translatable(
+                                    "safejump.config.categories.main.options.keybindings",
+                                    SafeJump.keyBinding.boundKeyLocalizedText
+                                )
+                            )
+                            .line(
+                                Text.translatable("safejump.config.categories.main.options.keybindings.notice")
+                                    .formatted(Formatting.GRAY)
+                            )
+                            .build()
+                    )
+                    .option(ButtonOption.createBuilder()
+                        .name(Text.translatable("safejump.config.categories.main.options.open-controls.name"))
+                        .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.open-controls.description")))
+                        .text(Text.empty())
+                        .action { _: YACLScreen?, _: ButtonOption? ->
+                            MinecraftClient.getInstance()
+                                .setScreen(KeybindsScreen(parent, MinecraftClient.getInstance().options))
                         }
                         .build())
-                .option(
-                    Option.createBuilder<DisplayType>()
-                    .name(Text.translatable("safejump.config.categories.main.options.display-type.name"))
-                    .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.display-type.description")))
-                    .binding(DisplayType.HEIGHT, { displayType }, { displayType = it })
-                    .controller { opt -> EnumControllerBuilder.create(opt)
-                        .enumClass(DisplayType::class.java)
-                    }
                     .build())
-                .option(
-                    Option.createBuilder<Int>()
-                        .name(Text.translatable("safejump.config.categories.main.options.radius.name"))
-                        .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.radius.description")))
-                        .binding(2, { radius }, { radius = it })
-                        .controller { opt -> IntegerSliderControllerBuilder.create(opt)
-                            .range(1, 10)
-                            .step(1)
-                        }
-                    .build())
-                .option(
-                    LabelOption.createBuilder()
-                        .line(
-                            Text.translatable(
-                                "safejump.config.categories.main.options.keybindings",
-                                SafeJump.keyBinding.boundKeyLocalizedText
-                            )
-                        )
-                        .line(
-                            Text.translatable("safejump.config.categories.main.options.keybindings.notice")
-                                .formatted(Formatting.GRAY)
-                        )
-                        .build()
-                )
-                .option(ButtonOption.createBuilder()
-                    .name(Text.translatable("safejump.config.categories.main.options.open-controls.name"))
-                    .description(OptionDescription.of(Text.translatable("safejump.config.categories.main.options.open-controls.description")))
-                    .text(Text.empty())
-                    .action { _: YACLScreen?, _: ButtonOption? ->
-                        MinecraftClient.getInstance()
-                            .setScreen(KeybindsScreen(parent, MinecraftClient.getInstance().options))
-                    }
-                    .build())
-                .build())
-            .build().generateScreen(parent)
+                .save { HANDLER.save() }
+                .build().generateScreen(parent)
+        }
     }
 
     enum class DisplayType : NameableEnum {
         DAMAGE, HEIGHT;
 
         override fun getDisplayName(): Text {
-            return Text.translatable("safejump.config.categories.main.options.display-type." + name.lowercase(Locale.getDefault()))
+            return Text.translatable("safejump.config.categories.main.options.display-type.options." + name.lowercase(Locale.getDefault()))
         }
     }
 

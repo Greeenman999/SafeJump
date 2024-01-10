@@ -1,6 +1,7 @@
 package de.greenman999.safejump
 
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterEntities
@@ -13,6 +14,7 @@ import net.minecraft.client.util.InputUtil
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.Text
 import net.minecraft.util.Colors
+import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -27,6 +29,8 @@ object SafeJump : ClientModInitializer {
 	private var isPressed: Boolean = false
 
 	override fun onInitializeClient() {
+		SafeJumpConfig.HANDLER.load()
+		SafeJumpConfig.HANDLER.save()
 		keyBinding = KeyBindingHelper.registerKeyBinding(
 			KeyBinding(
 				"key.safejump.show",
@@ -37,12 +41,15 @@ object SafeJump : ClientModInitializer {
 		)
 
 		WorldRenderEvents.AFTER_ENTITIES.register(AfterEntities { context ->
+			if(!SafeJumpConfig.enabled) return@AfterEntities
 			if(!isPressed) return@AfterEntities
 			val player = MinecraftClient.getInstance().player ?: return@AfterEntities
 			val world = player.world
 			val playerPos: BlockPos = player.blockPos
-			val from = playerPos.add(-2, 0, -2)
-			val to = playerPos.add(2, 0, 2)
+			val radius = SafeJumpConfig.radius
+			val from = playerPos.add(-radius, 0, -radius)
+			val to = playerPos.add(radius, 0, radius)
+			var safeCount = 0
 			for (x in from.x..to.x) {
 				for (z in from.z..to.z) {
 					for (y in playerPos.y downTo -64) {
@@ -60,13 +67,20 @@ object SafeJump : ClientModInitializer {
 							val fallDamage = 0f.coerceAtLeast(height.toFloat() - 3.5f)
 							val finalDamage = player.modifyAppliedDamage(world.damageSources.fall(), fallDamage)
 							val death: Boolean = finalDamage >= player.health
-							renderStringOnBlock(finalDamage.roundToInt().toString(), pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers(), death)
+							renderStringOnBlock(if(SafeJumpConfig.displayType == SafeJumpConfig.DisplayType.HEIGHT) height.toString() else finalDamage.roundToInt().toString(), pos.down(), context.matrixStack(), player.world, context.camera(), context.consumers(), death)
+							if(!death) safeCount++
 							break
 						}
 					}
 				}
 			}
-
+			if(SafeJumpConfig.actionBar) {
+				if(safeCount > 0) {
+					MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("safejump.overlay.message.safe", safeCount).formatted(Formatting.GREEN), false)
+				}else {
+					MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("safejump.overlay.message.death").formatted(Formatting.RED), false)
+				}
+			}
 		})
 	}
 
