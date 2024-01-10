@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "safejump",
 	"version": "${version}",
-	"name": "safejump",
+	"name": "SafeJump",
 	"description": "This mod displays the height of the blocks below you and tells you if you can safely jump down.",
 	"authors": [
 		"@Greenman999"
