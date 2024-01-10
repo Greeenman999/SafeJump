@@ -1,3 +1,23 @@
 {
-
+  "safejump.config.title": "SafeJump Configuration",
+  "safejump.config.categories.main.name": "Main Configuration",
+  "safejump.config.categories.main.tooltip": "",
+  "safejump.config.categories.main.options.enabled.name": "Enabled",
+  "safejump.config.categories.main.options.enabled.description": "Enable and disable the safejump mod.",
+  "safejump.config.categories.main.options.actionbar.name": "Show Actionbar",
+  "safejump.config.categories.main.options.actionbar.description": "Shows a message in the actionbar whether its safe to jump or not.",
+  "safejump.config.categories.main.options.display-type.name": "Block Display Type",
+  "safejump.config.categories.main.options.display-type.description": "Whether to display height or damage you get when jumping on that block.",
+  "safejump.config.categories.main.options.display-type.options.height": "Height",
+  "safejump.config.categories.main.options.display-type.options.damage": "Damage",
+  "safejump.config.categories.main.options.radius.name": "Display Radius",
+  "safejump.config.categories.main.options.radius.description": "The radius in blocks in which the safejump overlay is displayed.",
+  "safejump.config.categories.main.options.keybindings": "Please configure your keybindings in the controls menu. Currently set to: %d",
+  "safejump.config.categories.main.options.keybindings.notice": "Note: The keybinding told above is not updated until you reopen this screen.",
+  "safejump.config.categories.main.options.open-controls.name": "Open Keybindings",
+  "safejump.config.categories.main.options.open-controls.description": "Open the controls menu to configure the keybinding.",
+  "key.safejump.show": "Show SafeJump Overlay",
+  "category.safejump.main": "SafeJump",
+  "safejump.overlay.message.safe": "✅ Safe to jump! Found %d safe blocks.",
+  "safejump.overlay.message.death": "\uD83D\uDC80 You will die!"
 }

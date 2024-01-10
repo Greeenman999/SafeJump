@@ -1,0 +1,23 @@
+{
+  "safejump.config.title": "SafeJump Konfiguration",
+  "safejump.config.categories.main.name": "Hauptkonfiguration",
+  "safejump.config.categories.main.tooltip": "",
+  "safejump.config.categories.main.options.enabled.name": "Aktiviert",
+  "safejump.config.categories.main.options.enabled.description": "Aktiviere und deaktiviere den Safejump-Mod.",
+  "safejump.config.categories.main.options.actionbar.name": "Aktionsleiste anzeigen",
+  "safejump.config.categories.main.options.actionbar.description": "Zeigt eine Meldung in der Aktionsleiste an, ob es sicher ist zu springen oder nicht.",
+  "safejump.config.categories.main.options.display-type.name": "Block Anzeige Typ",
+  "safejump.config.categories.main.options.display-type.description": "Ob die Höhe oder der Schaden angezeigt werden soll, den du bekommst, wenn du auf diesen Block springst.",
+  "safejump.config.categories.main.options.display-type.options.height": "Höhe",
+  "safejump.config.categories.main.options.display-type.options.damage": "Schaden",
+  "safejump.config.categories.main.options.radius.name": "Radius anzeigen",
+  "safejump.config.categories.main.options.radius.description": "Der Radius in Blöcken, in dem das Safejump-Overlay angezeigt wird.",
+  "safejump.config.categories.main.options.keybindings": "Bitte konfiguriere deine Tastenkombinationen im Steuerungsmenü. Derzeit eingestellt auf: %d",
+  "safejump.config.categories.main.options.keybindings.notice": "Hinweis: Die oben angegebene Tastaturbelegung wird erst aktualisiert, wenn du diesen Bildschirm erneut öffnest.",
+  "safejump.config.categories.main.options.open-controls.name": "Tastenkombinationen öffnen",
+  "safejump.config.categories.main.options.open-controls.description": "Öffne das Steuerungsmenü, um die Tastaturbelegung zu konfigurieren.",
+  "key.safejump.show": "SafeJump Overlay anzeigen",
+  "category.safejump.main": "SafeJump",
+  "safejump.overlay.message.safe": "✅ Es ist sicher zu springen! %d gefundene sichere Blöcke.",
+  "safejump.overlay.message.death": "\uD83D\uDC80 Du wirst sterben!"
+}
